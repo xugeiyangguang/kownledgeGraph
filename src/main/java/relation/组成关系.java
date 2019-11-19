@@ -15,6 +15,7 @@ public class 组成关系 {
     public static List<String> getStartNodes() {
         List<String> startNodes = new ArrayList<>();
         startNodes.add("弧");
+        startNodes.add("弧");
 
         return startNodes;
     }
@@ -26,6 +27,7 @@ public class 组成关系 {
     public static List<String> getEndNodes() {
         List<String> endNodes = new ArrayList<>();
         endNodes.add("圆");
+        endNodes.add("扇形");
 
 
         return endNodes;

@@ -30,6 +30,18 @@ public class 属性关系 {
         startNodes.add("梯形");
         startNodes.add("圆");
         startNodes.add("圆");
+        startNodes.add("弧");
+        startNodes.add("圆");
+        startNodes.add("圆");
+        startNodes.add("三角形");
+        startNodes.add("轴对称图形");
+        startNodes.add("线段");
+        startNodes.add("线段");
+        startNodes.add("向量");
+        startNodes.add("椭圆");
+        startNodes.add("椭圆");
+        startNodes.add("双曲线");
+        startNodes.add("双曲线");
         return startNodes;
     }
 
@@ -55,6 +67,18 @@ public class 属性关系 {
         endNodes.add("梯形的面积");
         endNodes.add("直径");
         endNodes.add("半径");
+        endNodes.add("圆心角");
+        endNodes.add("弧");
+        endNodes.add("切线");
+        endNodes.add("三角形的内心");
+        endNodes.add("对称轴");
+        endNodes.add("线段的中点");
+        endNodes.add("线段的垂直平分线");
+        endNodes.add("向量的模");
+        endNodes.add("椭圆的离心率");
+        endNodes.add("椭圆的通径");
+        endNodes.add("双曲线的通径");
+        endNodes.add("双曲线的离心率");
 
         return endNodes;
     }

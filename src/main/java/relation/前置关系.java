@@ -33,6 +33,7 @@ public class 前置关系 {
         startNodes.add("位似图形");
         startNodes.add("勾股定理");
         startNodes.add("勾股数");
+        startNodes.add("同心圆");
         return startNodes;
     }
 
@@ -61,6 +62,7 @@ public class 前置关系 {
         endNodes.add("位似");
         endNodes.add("直角三角形");
         endNodes.add("勾股定理");
+        endNodes.add("圆");
 
         return endNodes;
     }

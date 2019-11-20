@@ -42,6 +42,9 @@ public class 属性关系 {
         startNodes.add("椭圆");
         startNodes.add("双曲线");
         startNodes.add("双曲线");
+        startNodes.add("直线");
+        startNodes.add("直线");
+        startNodes.add("三角形");
         return startNodes;
     }
 
@@ -79,6 +82,9 @@ public class 属性关系 {
         endNodes.add("椭圆的通径");
         endNodes.add("双曲线的通径");
         endNodes.add("双曲线的离心率");
+        endNodes.add("直线的倾斜角");
+        endNodes.add("直线的斜率");
+        endNodes.add("三角形的重心");
 
         return endNodes;
     }

@@ -33,6 +33,15 @@ public class 包含关系 {
         startNodes.add("极坐标方程");
         startNodes.add("极坐标方程");
         startNodes.add("极坐标方程");
+        startNodes.add("三视图");
+        startNodes.add("三视图");
+        startNodes.add("三视图");
+        startNodes.add("直线与平面的关系");
+        startNodes.add("直线与平面的关系");
+        startNodes.add("直线与平面的关系");
+        startNodes.add("两平面的位置关系");
+        startNodes.add("两平面的位置关系");
+        startNodes.add("两平面的位置关系");
 
         return startNodes;
     }
@@ -62,6 +71,15 @@ public class 包含关系 {
         endNodes.add("曲线的极坐标方程");
         endNodes.add("直线的极坐标方程");
         endNodes.add("圆的极坐标方程");
+        endNodes.add("主视图");
+        endNodes.add("侧视图");
+        endNodes.add("俯视图");
+        endNodes.add("直线与平面垂直");
+        endNodes.add("直线与平面平行");
+        endNodes.add("直线与平面相交");
+        endNodes.add("两平面相交");
+        endNodes.add("两平面平行");
+        endNodes.add("两平面垂直");
 
 
         return endNodes;

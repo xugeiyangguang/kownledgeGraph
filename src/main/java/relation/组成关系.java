@@ -3,6 +3,7 @@ package relation;
 import java.util.ArrayList;
 import java.util.List;
 
+/*什么组成给了什么*/
 public class 组成关系 {
     public static String getChineseName() {
         return "组成关系";
@@ -16,6 +17,8 @@ public class 组成关系 {
         List<String> startNodes = new ArrayList<>();
         startNodes.add("弧");
         startNodes.add("弧");
+        startNodes.add("平面");
+        startNodes.add("角");
 
         return startNodes;
     }
@@ -28,6 +31,8 @@ public class 组成关系 {
         List<String> endNodes = new ArrayList<>();
         endNodes.add("圆");
         endNodes.add("扇形");
+        endNodes.add("二面角");
+        endNodes.add("二面角");
 
 
         return endNodes;

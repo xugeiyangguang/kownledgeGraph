@@ -161,6 +161,26 @@ public class 前置关系 {
         startNodes.add("摆线的参数方程");
         startNodes.add("多面体的侧面积");
         startNodes.add("多面体的体积");
+        startNodes.add("圆柱的侧面展开图");
+        startNodes.add("三棱锥的表面积");
+        startNodes.add("三棱锥的体积");
+        startNodes.add("圆锥的侧面展开图");
+        startNodes.add("旋转体的侧面积");
+        startNodes.add("旋转体的表面积");
+        startNodes.add("旋转体的体积");
+        startNodes.add("投影");
+        startNodes.add("三视图");
+        startNodes.add("直观图");
+        startNodes.add("立体图形的平面展开图");
+        startNodes.add("点与直线的关系");
+        startNodes.add("点与面的关系");
+        startNodes.add("直线与平面的关系");
+        startNodes.add("两直线的位置关系");
+        startNodes.add("两平面的位置关系");
+        startNodes.add("点到平面的距离");
+        startNodes.add("直线和平面间的距离");
+        startNodes.add("直线和平面间的距离");
+        startNodes.add("两直线的距离");
 
         return startNodes;
     }
@@ -318,6 +338,26 @@ public class 前置关系 {
         endNodes.add("摆线");
         endNodes.add("多面体");
         endNodes.add("多面体");
+        endNodes.add("圆柱");
+        endNodes.add("三棱锥");
+        endNodes.add("三棱锥");
+        endNodes.add("圆锥");
+        endNodes.add("旋转体");
+        endNodes.add("旋转体");
+        endNodes.add("旋转体");
+        endNodes.add("空间几何体");
+        endNodes.add("空间几何体");
+        endNodes.add("空间几何体");
+        endNodes.add("空间几何体");
+        endNodes.add("直线的方程");
+        endNodes.add("平面");
+        endNodes.add("平面");
+        endNodes.add("直线");
+        endNodes.add("平面");
+        endNodes.add("平面");
+        endNodes.add("平面");
+        endNodes.add("平面");
+        endNodes.add("直线");
         return endNodes;
     }
 }

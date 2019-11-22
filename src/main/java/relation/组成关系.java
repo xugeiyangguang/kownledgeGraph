@@ -19,6 +19,8 @@ public class 组成关系 {
         startNodes.add("弧");
         startNodes.add("平面");
         startNodes.add("角");
+        startNodes.add("实部");
+        startNodes.add("虚部");
 
         return startNodes;
     }
@@ -33,6 +35,8 @@ public class 组成关系 {
         endNodes.add("扇形");
         endNodes.add("二面角");
         endNodes.add("二面角");
+        endNodes.add("复数");
+        endNodes.add("复数");
 
 
         return endNodes;

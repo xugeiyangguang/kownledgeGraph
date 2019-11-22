@@ -54,7 +54,8 @@ public class createConceptKG {
      * @param names
      * @throws Exception
      */
-    public static void addRelations(List<String> names) throws Exception{
+    public static int addRelations(List<String> names) throws Exception{
+        int relationNumber = 0;
         for(String name:names){
             Class cls=Class.forName(name);
             String type =name.split("\\.")[name.split("\\.").length-2];
@@ -63,9 +64,11 @@ public class createConceptKG {
             List<String> endNodes=new ArrayList<>();
             Map<String,String> properties=new HashMap<>();
             String ChineseName="";
+
             for(Method method:methods){
                 if(method.getName().equals("getStartNodes")&&method.getReturnType()==List.class){
                     startNodes=(List<String>)method.invoke(null);
+                    relationNumber++;
                 }
                 if(method.getName().equals("getEndNodes")&&method.getReturnType()==List.class){
                     endNodes=(List<String>)method.invoke(null);
@@ -89,13 +92,15 @@ public class createConceptKG {
             }
 
         }
+        return relationNumber;
     }
     /**
      * 添加关系“有子类”
      * @param names  entity包下的类名  （实体名）
      * @throws ClassNotFoundException
      */
-    public static void addHasSubclassRealtion (List<String> names) throws ClassNotFoundException{
+    public static int addHasSubclassRealtion (List<String> names) throws ClassNotFoundException{
+        int subClassNumber = 0;
         for (String name : names) {
             Class cls = Class.forName(name);
             System.out.println(cls.getSimpleName());
@@ -104,14 +109,16 @@ public class createConceptKG {
                 System.out.println("Interfaces :   " + c.getSimpleName());
                 GraphBaseUtils.createRelationship(c.getSimpleName(), cls.getSimpleName(), true, "有子类", "hasSubclass");
             }
+
             if (!cls.isInterface()) {
                 System.out.println("Superclass :   " + cls.getSuperclass().getSimpleName());
                 if (names.contains(cls.getName())) {
+                    subClassNumber++;
                     GraphBaseUtils.createRelationship(cls.getSuperclass().getSimpleName(), cls.getSimpleName(), true, "有子类", "hasSubclass");
                 }
             }
         }
-
+        return subClassNumber;
     }
     /**
      * 添加关系的属性
@@ -137,9 +144,10 @@ public class createConceptKG {
      * @param names
      * @throws Exception
      */
-    public static void getAllClassesAndInterfacesByName (List<String> names) throws Exception{
+    public static int getAllClassesAndInterfacesByName (List<String> names) throws Exception{
         ceateNodes(names);
-        addHasSubclassRealtion(names);
+        int re = addHasSubclassRealtion(names);
+        return re;
     }
 
     /**
@@ -348,8 +356,9 @@ public class createConceptKG {
             }
         }
         GraphBaseUtils.deleteGraphDBWithLabel("Concept");
-        createConceptKG.getAllClassesAndInterfacesByName(dataNames);
-        createConceptKG.addRelations(relationNames);
+        int subNum = createConceptKG.getAllClassesAndInterfacesByName(dataNames);
+        int otherNum = createConceptKG.addRelations(relationNames);
+        System.out.println("一共包含关系：" + subNum + otherNum + "个");
     }
 }
 

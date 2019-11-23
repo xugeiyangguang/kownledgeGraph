@@ -45,6 +45,10 @@ public class 属性关系 {
         startNodes.add("直线");
         startNodes.add("直线");
         startNodes.add("三角形");
+        startNodes.add("离散型随机变量");
+        startNodes.add("离散型随机变量");
+        startNodes.add("离散型随机变量");
+        startNodes.add("离散型随机变量");
         return startNodes;
     }
 
@@ -85,6 +89,10 @@ public class 属性关系 {
         endNodes.add("直线的倾斜角");
         endNodes.add("直线的斜率");
         endNodes.add("三角形的重心");
+        endNodes.add("离散型随机变量及其分布列");
+        endNodes.add("离散型随机变量的均值");
+        endNodes.add("离散型随机变量的方差");
+        endNodes.add("离散型随机变量的期望");
 
         return endNodes;
     }

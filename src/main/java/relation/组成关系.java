@@ -1,5 +1,8 @@
 package relation;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,5 +43,43 @@ public class 组成关系 {
 
 
         return endNodes;
+    }
+
+    public static void main(String[] args) {
+        List<String> startNode = getStartNodes();
+        List<String> endNode = getEndNodes();
+
+        for (String s : startNode) {
+
+            try {
+                //在这修改处理结果的路径
+                OutputStream os = new FileOutputStream("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\分类知识点及其关系\\组成关系1.txt", true);
+                PrintWriter pw=new PrintWriter(os);
+
+                pw.println(s);
+
+                pw.close();
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (String s : endNode) {
+
+            try {
+                //在这修改处理结果的路径
+                OutputStream os = new FileOutputStream("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\分类知识点及其关系\\组成关系2.txt", true);
+                PrintWriter pw=new PrintWriter(os);
+
+                pw.println(s);
+
+                pw.close();
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

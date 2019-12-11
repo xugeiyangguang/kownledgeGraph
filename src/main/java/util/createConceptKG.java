@@ -1,8 +1,8 @@
 package util;//import edu.uestc.auto.reasoning.utils.util.GraphBaseUtils;
+
 import org.neo4j.driver.v1.types.Node;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -15,35 +15,37 @@ import java.util.*;
  * @Date:2019-07-15-11-01
  */
 public class createConceptKG {
-    public static List<String> classes=new ArrayList<>();
-    public static String path="C:\\Users\\27124\\IdeaProjects\\graphknowledge_xy\\src\\main\\java";
+    public static List<String> classes = new ArrayList<>();
+    public static String path = "C:\\Users\\27124\\IdeaProjects\\graphknowledge_xy\\src\\main\\java";
     //public static String path="mathematics-model\\src\\main\\java";
     //public static String path="mathematics\\mathematics-model\\src\\main\\java";
+
     /**
      * 创建节点，将mathematics-model下面的entity包里面的类创建为实体
+     *
      * @param names
      * @throws Exception
      */
-    public static void ceateNodes(List<String> names) throws Exception{
-        for (String name:names){
-            Class cls=Class.forName(name);
-            String type =name.split("\\.")[name.split("\\.").length-2];
-            Method[] methods=cls.getDeclaredMethods();
-            Map<String,String> properties=new HashMap<>();
-            String ChineseName="";
+    public static void ceateNodes(List<String> names) throws Exception {
+        for (String name : names) {
+            Class cls = Class.forName(name);
+            String type = name.split("\\.")[name.split("\\.").length - 2];
+            Method[] methods = cls.getDeclaredMethods();
+            Map<String, String> properties = new HashMap<>();
+            String ChineseName = "";
             //得到Chinese类，将其添加为属性。
-            for(Method method:methods){
-                if(method.getName().equals("getChineseName")&& method.getReturnType()==String.class){
-                    ChineseName=(String)method.invoke(null);
+            for (Method method : methods) {
+                if (method.getName().equals("getChineseName") && method.getReturnType() == String.class) {
+                    ChineseName = (String) method.invoke(null);
                 }
-                if(method.getName().equals("getProperties") && method.getReturnType()==Map.class){
-                    properties=(Map<String, String>)method.invoke(null);
+                if (method.getName().equals("getProperties") && method.getReturnType() == Map.class) {
+                    properties = (Map<String, String>) method.invoke(null);
                 }
             }
-            if(!classes.contains(cls.getSimpleName())){
-                GraphBaseUtils.createNodeWithLabel(cls.getSimpleName(),"entity",type);
-                GraphBaseUtils.addNodeProperties(cls.getSimpleName(),"Concept:"+type,"ChineseName",ChineseName);
-                GraphBaseUtils.addNodeProperties(properties,cls.getSimpleName(),"Concept:"+type);
+            if (!classes.contains(cls.getSimpleName())) {
+                GraphBaseUtils.createNodeWithLabel(cls.getSimpleName(), "entity", type);
+                GraphBaseUtils.addNodeProperties(cls.getSimpleName(), "Concept:" + type, "ChineseName", ChineseName);
+                GraphBaseUtils.addNodeProperties(properties, cls.getSimpleName(), "Concept:" + type);
             }
 
         }
@@ -51,55 +53,77 @@ public class createConceptKG {
 
     /**
      * 将mathematics-model下面的relation包里面的类创建为关系
+     *
      * @param names
      * @throws Exception
      */
-    public static int addRelations(List<String> names) throws Exception{
-        int relationNumber = 0;
-        for(String name:names){
-            Class cls=Class.forName(name);
-            String type =name.split("\\.")[name.split("\\.").length-2];
-            Method[] methods=cls.getDeclaredMethods();
-            List<String> startNodes=new ArrayList<>();
-            List<String> endNodes=new ArrayList<>();
-            Map<String,String> properties=new HashMap<>();
-            String ChineseName="";
+    public static int addRelations(List<String> names) throws Exception {
 
-            for(Method method:methods){
-                if(method.getName().equals("getStartNodes")&&method.getReturnType()==List.class){
-                    startNodes=(List<String>)method.invoke(null);
-                    relationNumber++;
+        int 前置关系 = 0;
+        int 包含关系 = 0;
+        int 属性关系 = 0;
+        int 组成关系 = 0;
+
+        for (String name : names) {
+            Class cls = Class.forName(name);
+            String type = name.split("\\.")[name.split("\\.").length - 2];
+            Method[] methods = cls.getDeclaredMethods();
+            List<String> startNodes = new ArrayList<>();
+            List<String> endNodes = new ArrayList<>();
+            Map<String, String> properties = new HashMap<>();
+            String ChineseName = "";
+
+            for (Method method : methods) {
+                if (method.getName().equals("getStartNodes") && method.getReturnType() == List.class) {
+                    startNodes = (List<String>) method.invoke(null);
                 }
-                if(method.getName().equals("getEndNodes")&&method.getReturnType()==List.class){
-                    endNodes=(List<String>)method.invoke(null);
+                if (method.getName().equals("getEndNodes") && method.getReturnType() == List.class) {
+                    endNodes = (List<String>) method.invoke(null);
                 }
-                if(method.getName().equals("getChineseName")&&method.getReturnType()==String.class){
-                    ChineseName=(String)method.invoke(null);
+                if (method.getName().equals("getChineseName") && method.getReturnType() == String.class) {
+                    ChineseName = (String) method.invoke(null);
                 }
-                if(method.getName().equals("getProperties")&&method.getReturnType()==Map.class){
-                    properties=(Map<String,String>)method.invoke(null);
+                if (method.getName().equals("getProperties") && method.getReturnType() == Map.class) {
+                    properties = (Map<String, String>) method.invoke(null);
                 }
             }
-            if(startNodes.size()!=endNodes.size()){
+            if (startNodes.size() != endNodes.size()) {
                 continue;
             }
 
             for (int i = 0; i < startNodes.size(); i++) {
                 System.out.println(startNodes.get(i) + " " + endNodes.get(i) + " " + cls.getSimpleName() + " " + type);
                 GraphBaseUtils.createRelationship(startNodes.get(i), endNodes.get(i), true, cls.getSimpleName(), type);
-                GraphBaseUtils.addPropertiesForRelatoin(cls.getSimpleName(),type,"ChineseName",ChineseName);
+                GraphBaseUtils.addPropertiesForRelatoin(cls.getSimpleName(), type, "ChineseName", ChineseName);
                 GraphBaseUtils.addRelationShipProperties(properties, cls.getSimpleName(), type);
             }
 
+            if (name.contains("前置关系")) {
+                前置关系 = startNodes.size();
+            } else if (name.contains("包含关系")) {
+                包含关系 = startNodes.size();
+            } else if (name.contains("属性关系")) {
+                属性关系 = startNodes.size();
+            } else if (name.contains("组成关系")) {
+                组成关系 = startNodes.size();
+            }
+
+
         }
-        return relationNumber;
+        System.out.println("前置关系：" + 前置关系);
+        System.out.println("包含关系：" + 包含关系);
+        System.out.println("属性关系：" + 属性关系);
+        System.out.println("组成关系：" + 组成关系);
+        return 前置关系 + 包含关系 + 属性关系 + 组成关系;
     }
+
     /**
      * 添加关系“有子类”
-     * @param names  entity包下的类名  （实体名）
+     *
+     * @param names entity包下的类名  （实体名）
      * @throws ClassNotFoundException
      */
-    public static int addHasSubclassRealtion (List<String> names) throws ClassNotFoundException{
+    public static int addHasSubclassRealtion(List<String> names) throws ClassNotFoundException {
         int subClassNumber = 0;
         for (String name : names) {
             Class cls = Class.forName(name);
@@ -110,24 +134,65 @@ public class createConceptKG {
                 GraphBaseUtils.createRelationship(c.getSimpleName(), cls.getSimpleName(), true, "有子类", "hasSubclass");
             }
 
+            ArrayList<String> startNode = new ArrayList<>();
+            ArrayList<String> endNode = new ArrayList<>();
             if (!cls.isInterface()) {
                 System.out.println("Superclass :   " + cls.getSuperclass().getSimpleName());
                 if (names.contains(cls.getName())) {
-                    subClassNumber++;
                     GraphBaseUtils.createRelationship(cls.getSuperclass().getSimpleName(), cls.getSimpleName(), true, "有子类", "hasSubclass");
+                    if (!cls.getSuperclass().getSimpleName().equals("Object")) {
+                        subClassNumber++;
+                        startNode.add(cls.getSuperclass().getSimpleName());
+                        endNode.add(cls.getSimpleName());
+                    }
+
+                }
+            }
+            //将子类关系输出到txt中
+            for (String s : startNode) {
+
+                try {
+                    //在这修改处理结果的路径
+                    OutputStream os = new FileOutputStream("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\分类知识点及其关系\\子类关系1.txt", true);
+                    PrintWriter pw=new PrintWriter(os);
+
+                    pw.println(s);
+
+                    pw.close();
+                    os.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            for (String s : endNode) {
+
+                try {
+                    //在这修改处理结果的路径
+                    OutputStream os = new FileOutputStream("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\分类知识点及其关系\\子类关系2.txt", true);
+                    PrintWriter pw=new PrintWriter(os);
+
+                    pw.println(s);
+
+                    pw.close();
+                    os.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
         return subClassNumber;
     }
+
     /**
      * 添加关系的属性
-     * @param properties  属性名和属性值
-     * @param relationshipName   关系名
-     * @param relationLabel      关系标签
+     *
+     * @param properties       属性名和属性值
+     * @param relationshipName 关系名
+     * @param relationLabel    关系标签
      */
     public static void addRelationShipProperties(Map<String, String> properties, String relationshipName,
-                                                 String relationLabel){
+                                                 String relationLabel) {
         for (String property : properties.keySet()) {
             GraphBaseUtils.addNodeProperties(relationshipName, relationLabel, property, properties.get(property));
         }
@@ -139,12 +204,14 @@ public class createConceptKG {
             GraphBaseUtils.addNodeProperties(relationshipName, relationLabel, property, properties.get(property));
         }
     }
+
     /**
      * 创建节点 添加“有子类” 关系
+     *
      * @param names
      * @throws Exception
      */
-    public static int getAllClassesAndInterfacesByName (List<String> names) throws Exception{
+    public static int getAllClassesAndInterfacesByName(List<String> names) throws Exception {
         ceateNodes(names);
         int re = addHasSubclassRealtion(names);
         return re;
@@ -152,10 +219,11 @@ public class createConceptKG {
 
     /**
      * 得到所有的类和接口的名字
+     *
      * @param path
      * @return
      */
-    public static List<String> getAllClassesAndInterfacesName (String path) {
+    public static List<String> getAllClassesAndInterfacesName(String path) {
         File file = new File(path);
         List<String> nameResults = new ArrayList<>();
         if (file.exists()) {
@@ -167,8 +235,7 @@ public class createConceptKG {
             for (File tempFile : files) {
                 if (tempFile.isDirectory()) {
                     list.add(tempFile);
-                }
-                else {
+                } else {
                     fileResults.add(tempFile);
                 }
             }
@@ -180,8 +247,7 @@ public class createConceptKG {
                 for (File tempFile : files) {
                     if (tempFile.isDirectory()) {
                         list.add(tempFile);
-                    }
-                    else {
+                    } else {
                         fileResults.add(tempFile);
                     }
                 }
@@ -192,12 +258,13 @@ public class createConceptKG {
         }
         return nameResults;
     }
+
     /**
      * 获得一个节点的某个属性的属性值  节点为带有标签“Concept”的节点
      */
-    public static void getAllPropertiesOfANode () {
+    public static void getAllPropertiesOfANode() {
         Scanner sc = new Scanner(System.in);
-        while(true) {
+        while (true) {
             System.out.println("请输入节点的名字：");
             String name = sc.nextLine();
             if (name.equals("exit")) {
@@ -231,7 +298,7 @@ public class createConceptKG {
     /**
      * 获得所有的某个属性的属性值  节点为带有标签“Concept”的节点
      */
-    public static void getAllPropertiesOfAllNode (List<String> dataNames) throws Exception{
+    public static void getAllPropertiesOfAllNode(List<String> dataNames) throws Exception {
         for (String name : dataNames) {
             Class cls = Class.forName(name);
             System.out.println(cls.getSimpleName() + ": ");
@@ -244,13 +311,14 @@ public class createConceptKG {
         }
 
     }
+
     /**
      * 处理输入的节点
-     * @return
-     *         "false"：节点不存在
-     *         "exit"：退出指令
+     *
+     * @return "false"：节点不存在
+     * "exit"：退出指令
      */
-    public static String inputNode () {
+    public static String inputNode() {
         Scanner sc = new Scanner(System.in);
         String name = sc.nextLine();
         if (name.equals("exit")) {
@@ -265,11 +333,12 @@ public class createConceptKG {
 
     /**
      * 通过节点的中文名或者英文名来获得节点
-     * @param label   节点的标签
-     * @param name     节点的名字
-     * @return   不存在为null   存在则返回该节点
+     *
+     * @param label 节点的标签
+     * @param name  节点的名字
+     * @return 不存在为null   存在则返回该节点
      */
-    public static Node getNodeByChineseNameOrName (String label, String name) {
+    public static Node getNodeByChineseNameOrName(String label, String name) {
         if (GraphBaseUtils.getNodeWithLabelAndName(label, name, "ChineseName") != null) {
             return GraphBaseUtils.getNodeWithLabelAndName(label, name, "ChineseName");
         }
@@ -319,6 +388,7 @@ public class createConceptKG {
         }
         return classes;
     }
+
     private static List findClasses(File directory, String packageName) throws ClassNotFoundException {
         List classes = new ArrayList();
         if (!directory.exists()) {
@@ -343,22 +413,63 @@ public class createConceptKG {
 //        classes.add("edu.uestc.auto.reasoning.utils.util.GraphBaseUtils");
         classes.add("util.DriverSingleton");
         classes.add("util.GraphBaseUtils");
-        List<String> names=createConceptKG.getAllClassesAndInterfacesName(path);
-        List<String> dataNames=new ArrayList<>();
-        List<String> relationNames=new ArrayList<>();
+        List<String> names = createConceptKG.getAllClassesAndInterfacesName(path);
+        List<String> dataNames = new ArrayList<>();
+        List<String> relationNames = new ArrayList<>();
+        int 代数 = 0;
+        int 几何 = 0;
+        int 推理与证明 = 0;
+        int 概率 = 0;
+        int 矩阵与变换 = 0;
+        int 简易逻辑 = 0;
+        int 算法初步 = 0;
+        int 统计 = 0;
+        int 计数原理 = 0;
+
+
         for (String name : names) {
             if (name.contains("data.")) {
                 dataNames.add(name);
+                if (name.contains("代数")) {
+                    代数++;
+                } else if (name.contains("几何")) {
+                    几何++;
+                } else if (name.contains("推理与证明")) {
+                    推理与证明++;
+                } else if (name.contains("概率")) {
+                    概率++;
+                } else if (name.contains("矩阵与变换")) {
+                    矩阵与变换++;
+                } else if (name.contains("简易逻辑")) {
+                    简易逻辑++;
+                } else if (name.contains("算法初步")) {
+                    算法初步++;
+                } else if (name.contains("统计")) {
+                    统计++;
+                } else if (name.contains("计数原理")) {
+                    计数原理++;
+                }
             }
 
-            if (name.contains("relation.") && !name.contains(".conclusion.")&& !name.contains(".notsure.") ) {
+            if (name.contains("relation.") && !name.contains(".conclusion.") && !name.contains(".notsure.")) {
                 relationNames.add(name);
+
             }
         }
         GraphBaseUtils.deleteGraphDBWithLabel("Concept");
         int subNum = createConceptKG.getAllClassesAndInterfacesByName(dataNames);
         int otherNum = createConceptKG.addRelations(relationNames);
-        System.out.println("一共包含关系：" + subNum + otherNum + "个");
+        System.out.println("子类关系：" + subNum + "个");
+        System.out.println("一共包含关系：" + (subNum + otherNum));
+        System.out.println("代数：" + 代数);
+        System.out.println("几何：" + 几何);
+        System.out.println("推理与证明：" + 推理与证明);
+        System.out.println("概率：" + 概率);
+        System.out.println("矩阵与变换：" + 矩阵与变换);
+        System.out.println("简易逻辑：" + 简易逻辑);
+        System.out.println("算法初步：" + 算法初步);
+        System.out.println("统计：" + 统计);
+        System.out.println("计数原理：" + 计数原理);
     }
 }
 

@@ -239,6 +239,72 @@ public class GraphBaseUtils {
     }
 
     /**
+     * 获取指定的名称节点的指定关系节点
+     * */
+    public static void getAllNodesHasRelation1(String startName, String relationshipName, boolean flag) {
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            String s1 = "<-";
+            String s2 = "-";
+            if (flag) {
+                s1 = "-";
+                s2 = "->";
+            }
+            //match (n:代数{name:"函数"})-[:relation{name:"前置关系"}]->(m) return m
+            String cypher = "match (m{name:'" + startName + "'})" + s1 +
+                    "[r{name:'" + relationshipName + "'}]" + s2 + "(n) return n";
+            LOG.debug(cypher);
+            StatementResult result = tx.run(cypher);
+            if (!result.hasNext()) {
+                return;
+            }
+            while (result.hasNext()) {
+                String tmp = result.next().get(0).get("name").toString();
+                System.out.println(startName + "-" + relationshipName + "->" + tmp.substring(1, tmp.length() - 1));
+            }
+//            }
+            tx.success();
+            tx.close();
+
+            //   System.out.println(re);
+        }
+    }
+
+
+    /**
+     * @param startName   开始节点的名称
+     * @param flag   为1表示是开始节点
+     * 输出某一结点的所有相邻节点
+     */
+
+    public static void getAllNodesHasRelation2(String startName, boolean flag) {
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            //match (n:代数{name:"函数"})-[r]->(m:代数) return n,m,r
+            String cypher= String.format("match (n{name:\"%s\"})-[r]->(m) return n,m,r",startName);
+            LOG.debug(cypher);
+            StatementResult result = tx.run(cypher);
+            List<String> re = new ArrayList<>();
+            if (!result.hasNext()) {
+                return;
+            }
+            while (result.hasNext()) {
+                Record tmp = result.next();
+                String start = tmp.get(0).get("name").toString();
+
+                String end = tmp.get(1).get("name").toString();
+                String relation = tmp.get(2).get("name").toString();
+                System.out.println(start + "-" + relation + "->" + end);
+            }
+//            }
+            tx.success();
+            tx.close();
+
+            //   System.out.println(re);
+        }
+    }
+
+
+
+    /**
      * 通过节点的标签1（在概念知识图谱中通常设置为Concept），
      * 标签2，标签2的具体名字（在概念知识图谱中一般是ChineseName的值，如“直线”）
      *
@@ -749,7 +815,7 @@ public class GraphBaseUtils {
      */
     public static List<String> getRelationsBetweenTwoNodes(String node1,String node2){
         List<String> relations=new ArrayList<>();
-        String cypher= String.format("match(n{ChineseName:\"%s\"})-[r]->(m{ChineseName:\"%s\"}) return r.ChineseName", node1, node2);
+        String cypher= String.format("match(n{name:\"%s\"})-[r]->(m{name:\"%s\"}) return r.name", node1, node2);
         LOG.debug(cypher);
         try (Transaction tx=DriverSingleton.getInstance().session().beginTransaction()){
             StatementResult result=tx.run(cypher);
@@ -815,8 +881,11 @@ public class GraphBaseUtils {
     }
     public static void main(String[] args) throws Exception {
 //        System.out.println(getPropertiesBetweenTwoNodes("数列","数列的项"));
-        System.out.println(getPropertiesOfRelation("值关系"));
-//        System.out.println(getRelationsBetweenTwoNodes("数列","数列的项"));
+     //   System.out.println(getPropertiesOfRelation("值关系"));
+     //   System.out.println(getRelationsBetweenTwoNodes("函数","增函数"));
+      //  getAllNodesHasRelation1("函数", "前置关系", true);
+         getAllNodesHasRelation2("反证法", false);
+
     }
 
 }

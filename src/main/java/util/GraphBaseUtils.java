@@ -240,6 +240,7 @@ public class GraphBaseUtils {
 
     /**
      * 获取指定的名称节点的指定关系节点
+     * 许阳
      * */
     public static void getAllNodesHasRelation1(String startName, String relationshipName, boolean flag) {
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
@@ -274,25 +275,30 @@ public class GraphBaseUtils {
      * @param startName   开始节点的名称
      * @param flag   为1表示是开始节点
      * 输出某一结点的所有相邻节点
+     *              许阳
      */
 
-    public static void getAllNodesHasRelation2(String startName, boolean flag) {
+    public static HashSet<String> getAllNodesHasRelation2(String startName, boolean flag) {
+        HashSet<String> re = new HashSet<>();   //存储相关的知识点
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             //match (n:代数{name:"函数"})-[r]->(m:代数) return n,m,r
             String cypher= String.format("match (n{name:\"%s\"})-[r]->(m) return n,m,r",startName);
-            LOG.debug(cypher);
+         //   LOG.debug(cypher);
             StatementResult result = tx.run(cypher);
-            List<String> re = new ArrayList<>();
+         //   List<String> re = new ArrayList<>();
             if (!result.hasNext()) {
-                return;
+                return null;
             }
             while (result.hasNext()) {
                 Record tmp = result.next();
                 String start = tmp.get(0).get("name").toString();
-
                 String end = tmp.get(1).get("name").toString();
                 String relation = tmp.get(2).get("name").toString();
-                System.out.println(start + "-" + relation + "->" + end);
+                String s = start + "-" + relation + "->" + end;
+                String endTmp1 = end.replace("\"","");
+                re.add(endTmp1);
+
+                System.out.println(s);
             }
 //            }
             tx.success();
@@ -300,6 +306,7 @@ public class GraphBaseUtils {
 
             //   System.out.println(re);
         }
+        return re;
     }
 
 
@@ -883,8 +890,8 @@ public class GraphBaseUtils {
 //        System.out.println(getPropertiesBetweenTwoNodes("数列","数列的项"));
      //   System.out.println(getPropertiesOfRelation("值关系"));
      //   System.out.println(getRelationsBetweenTwoNodes("函数","增函数"));
-      //  getAllNodesHasRelation1("函数", "前置关系", true);
-         getAllNodesHasRelation2("反证法", false);
+      //  getAllNodesHasRelation1("函数", "前置关系", true);   //获取节点指定关系的其他节点
+         getAllNodesHasRelation2("平方根", false);   //获取节点的所有相关节点
 
     }
 

@@ -34,6 +34,7 @@ public class TestPython {
     public static void runCMD(String cmd) {
         Runtime runtime = Runtime.getRuntime();
         Process child = null;
+        int i = 1;
         try {
             child = runtime.exec(cmd);
             InputStream in = child.getInputStream();
@@ -43,8 +44,11 @@ public class TestPython {
 
             output = bufferedReader.readLine();
             while (output != null) {
-                System.out.println(output);
+                if(i!=2) {
+                    System.out.println(output);
+                }
                 output = bufferedReader.readLine();
+                i++;
             }
             try {
                 //isSuccessful = child.waitFor();

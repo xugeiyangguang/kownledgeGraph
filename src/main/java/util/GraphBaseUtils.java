@@ -891,7 +891,7 @@ public class GraphBaseUtils {
      //   System.out.println(getPropertiesOfRelation("值关系"));
      //   System.out.println(getRelationsBetweenTwoNodes("函数","增函数"));
       //  getAllNodesHasRelation1("函数", "前置关系", true);   //获取节点指定关系的其他节点
-         getAllNodesHasRelation2("平方根", false);   //获取节点的所有相关节点
+         getAllNodesHasRelation2("平行四边形", false);   //获取节点的所有相关节点
 
     }
 

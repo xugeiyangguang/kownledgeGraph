@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class TestPython {
 
@@ -31,7 +32,8 @@ public class TestPython {
 //        }
     }
 
-    public static void runCMD(String cmd) {
+    public static ArrayList<String> runCMD(String cmd) {
+        ArrayList<String> kownledge = new ArrayList<>();
         Runtime runtime = Runtime.getRuntime();
         Process child = null;
         int i = 1;
@@ -44,11 +46,15 @@ public class TestPython {
 
             output = bufferedReader.readLine();
             while (output != null) {
-                if(i!=2) {
+                if(i!=2) {   //不输出第2行
                     System.out.println(output);
                 }
                 output = bufferedReader.readLine();
                 i++;
+
+                if (i >= 7 && i <= 9) {
+                    kownledge.add(output);
+                }
             }
             try {
                 //isSuccessful = child.waitFor();
@@ -62,6 +68,8 @@ public class TestPython {
                 child.destroy();
             }
         }
+        return kownledge;
     }
+
 
 }

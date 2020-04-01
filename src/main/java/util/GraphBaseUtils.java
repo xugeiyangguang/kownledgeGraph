@@ -33,6 +33,7 @@ public class GraphBaseUtils {
             tx.success();
         }
     }
+
     /**
      * 删除所有节点关系
      */
@@ -44,16 +45,19 @@ public class GraphBaseUtils {
             tx.success();
         }
     }
-    /**\
+
+    /**
+     * \
      * 为关系添加属性
+     *
      * @param relationshipName  关系名字（name属性）
      * @param relationshipLabel 关系的标签
-     * @param property  属性的名字
-     * @param propertyValue  属性的值
+     * @param property          属性的名字
+     * @param propertyValue     属性的值
      */
-    public static void addRelationshipProperties (String relationshipName, String relationshipLabel,
-                                           String property, String propertyValue) {
-        try (Transaction tx =DriverSingleton.getInstance().session().beginTransaction()){
+    public static void addRelationshipProperties(String relationshipName, String relationshipLabel,
+                                                 String property, String propertyValue) {
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             String cypher = "match () -[r:" + relationshipLabel + "{name : '" + relationshipName + "'}]->()"
                     + "set r." + property + " = " + "'" + propertyValue + "'";
             tx.run(cypher);
@@ -61,18 +65,22 @@ public class GraphBaseUtils {
             tx.close();
         }
     }
-    /**\
+
+    /**
+     * \
      * 添加关系的属性
-     * @param properties  属性名和属性值
-     * @param relationshipName   关系名
-     * @param relationLabel      关系标签
+     *
+     * @param properties       属性名和属性值
+     * @param relationshipName 关系名
+     * @param relationLabel    关系标签
      */
     public static void addRelationShipProperties(Map<String, String> properties, String relationshipName,
-                                                 String relationLabel){
+                                                 String relationLabel) {
         for (String property : properties.keySet()) {
             GraphBaseUtils.addRelationshipProperties(relationshipName, relationLabel, property, properties.get(property));
         }
     }
+
     /**
      * 在概念知识图谱中创建节点，赋予两个标签label1，label2.并且给与节点名字。
      *
@@ -142,6 +150,7 @@ public class GraphBaseUtils {
             tx.success();
         }
     }
+
     /**
      * 在概念知识图谱中创建两个节点之间的关系
      *
@@ -241,7 +250,7 @@ public class GraphBaseUtils {
     /**
      * 获取指定的名称节点的指定关系节点
      * 许阳
-     * */
+     */
     public static void getAllNodesHasRelation1(String startName, String relationshipName, boolean flag) {
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             String s1 = "<-";
@@ -272,34 +281,80 @@ public class GraphBaseUtils {
 
 
     /**
-     * @param startName   开始节点的名称
-     * @param flag   为1表示是开始节点
-     * 输出某一结点的所有相邻节点
-     *              许阳
+     * @param startName 开始节点的名称
+     * @param flag      为1表示是开始节点
+     *                  输出某一结点的所有相邻节点
+     *                  许阳
      */
 
-    public static HashSet<String> getAllNodesHasRelation2(String startName, boolean flag) {
-        HashSet<String> re = new HashSet<>();   //存储相关的知识点
+    public static HashMap<String,String> getAllNodesHasRelation2(String startName) {
+        HashMap<String,String> re = new HashMap<>();   //存储相关的知识点
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             //match (n:代数{name:"函数"})-[r]->(m:代数) return n,m,r
-            String cypher= String.format("match (n{name:\"%s\"})-[r]->(m) return n,m,r",startName);
-         //   LOG.debug(cypher);
+            String cypher = String.format("match (n{name:\"%s\"})<-[r]-(m) return n,m,r", startName);
+            //   LOG.debug(cypher);
             StatementResult result = tx.run(cypher);
-         //   List<String> re = new ArrayList<>();
-            if (!result.hasNext()) {
+            //   List<String> re = new ArrayList<>();
+            /*if (!result.hasNext()) {
                 return null;
-            }
-            while (result.hasNext()) {
+            }*/
+            String s = "";while (result.hasNext()) {
                 Record tmp = result.next();
                 String start = tmp.get(0).get("name").toString();
                 String end = tmp.get(1).get("name").toString();
                 String relation = tmp.get(2).get("name").toString();
-                String s = start + "-" + relation + "->" + end;
-                String endTmp1 = end.replace("\"","");
-                re.add(endTmp1);
+                s = end + "-" + relation + "->" + start;
+                String endTmp1 = end.replace("\"", "");
+                String rel = relation.replace("\"", "");
+                if (rel.equals("有前驱")){
+                    re.put(endTmp1,"前驱关系");
+                }else if(rel.equals("有子类")){
+                    re.put(endTmp1,"子类关系");
+                }else if(rel.equals("有属性")){
+                    re.put(endTmp1,"属性关系");
+                }else if(rel.equals("有考点")){
+                    re.put(endTmp1,"考点关系");
+                }else if(rel.equals("有部分")){
+                    re.put(endTmp1,"组成关系");
+                }
+
 
                 System.out.println(s);
             }
+
+            String cypher1 = String.format("match (n{name:\"%s\"})-[r]->(m) return n,m,r", startName);
+            //   LOG.debug(cypher);
+            StatementResult result1 = tx.run(cypher1);
+            //   List<String> re = new ArrayList<>();
+            /*if (!result1.hasNext()) {
+                return null;
+            }*/
+            while (result1.hasNext()) {
+                Record tmp = result1.next();
+                String start = tmp.get(0).get("name").toString();
+                String end = tmp.get(1).get("name").toString();
+                String relation = tmp.get(2).get("name").toString();
+                s = start + "-" + relation + "->" + end;
+                String endTmp1 = end.replace("\"", "");
+                String rel = relation.replace("\"", "");
+                if (rel.equals("有前驱")){
+                    re.put(endTmp1,"前驱关系");
+                }else if(rel.equals("有子类")){
+                    re.put(endTmp1,"子类关系");
+                }else if(rel.equals("有属性")){
+                    re.put(endTmp1,"属性关系");
+                }else if(rel.equals("有考点")){
+                    re.put(endTmp1,"考点关系");
+                }else if(rel.equals("有部分")){
+                    re.put(endTmp1,"组成关系");
+                }
+
+                //   re.add(endTmp1);
+
+                System.out.println(s);
+
+            }
+
 //            }
             tx.success();
             tx.close();
@@ -308,7 +363,6 @@ public class GraphBaseUtils {
         }
         return re;
     }
-
 
 
     /**
@@ -572,10 +626,11 @@ public class GraphBaseUtils {
      */
     /**
      * 得到所有的类和接口的名字
+     *
      * @param path
      * @return
      */
-    public static List<String> getAllClassesAndInterfacesName (String path) {
+    public static List<String> getAllClassesAndInterfacesName(String path) {
         File file = new File(path);
         List<String> nameResults = new ArrayList<>();
         if (file.exists()) {
@@ -587,8 +642,7 @@ public class GraphBaseUtils {
             for (File tempFile : files) {
                 if (tempFile.isDirectory()) {
                     list.add(tempFile);
-                }
-                else {
+                } else {
                     fileResults.add(tempFile);
                 }
             }
@@ -600,8 +654,7 @@ public class GraphBaseUtils {
                 for (File tempFile : files) {
                     if (tempFile.isDirectory()) {
                         list.add(tempFile);
-                    }
-                    else {
+                    } else {
                         fileResults.add(tempFile);
                     }
                 }
@@ -612,6 +665,7 @@ public class GraphBaseUtils {
         }
         return nameResults;
     }
+
     public static List<Node> getAllEndNodeWtheRelationshipName(String relationshipLabel, String relationshipName, String nodeName) {
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             List<Node> nodes = new ArrayList<>();
@@ -629,21 +683,24 @@ public class GraphBaseUtils {
             return nodes;
         }
     }
+
     public static void addNodeProperties(Map<String, String> properties, String relationshipName,
                                          String relationLabel) {
         for (String property : properties.keySet()) {
             GraphBaseUtils.addNodeProperties(relationshipName, relationLabel, property, properties.get(property));
         }
     }
+
     /**
      * 为节点添加属性
+     *
      * @param nodeName
      * @param nodeLabel
      * @param property
      * @param propertyValue
      */
-    public static void addNodeProperties(String nodeName, String nodeLabel, String property, String propertyValue){
-        try (Transaction tx=DriverSingleton.getInstance().session().beginTransaction()){
+    public static void addNodeProperties(String nodeName, String nodeLabel, String property, String propertyValue) {
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             String cypher = "match (n: " + nodeLabel + " {name : '" + nodeName + "' })"
                     + "set n." + property + " = " + "'" + propertyValue + "'";
             tx.run(cypher);
@@ -651,6 +708,7 @@ public class GraphBaseUtils {
             tx.close();
         }
     }
+
     /**
      * \
      * 获得某个特定关系的value
@@ -729,12 +787,13 @@ public class GraphBaseUtils {
 
     /**
      * 根据属性查找节点
+     *
      * @param key
      * @param val
      * @return
      */
     public static List<String> getNodes(String key, String val) {
-        String cql = String.format("match(n) where n.%s = \"%s\" return n.name",key,val);
+        String cql = String.format("match(n) where n.%s = \"%s\" return n.name", key, val);
         LOG.debug(cql);
         List<String> nodes = new ArrayList<>(2);
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
@@ -749,24 +808,25 @@ public class GraphBaseUtils {
         }
         return nodes;
     }
-    public static List<String> getNodesByLinkedNode(String nodeName){
-        List<String> nodes=new ArrayList<>();
-        try (Transaction tx=DriverSingleton.getInstance().session().beginTransaction()){
-            String cypher=String.format("MATCH (n{ChineseName:\"%s\"}) -[]-> (m) RETURN m.ChineseName",nodeName);
-            String cypher2=String.format("MATCH (n) -[]-> (m{ChineseName:\"%s\"}) RETURN n.ChineseName",nodeName);
+
+    public static List<String> getNodesByLinkedNode(String nodeName) {
+        List<String> nodes = new ArrayList<>();
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            String cypher = String.format("MATCH (n{ChineseName:\"%s\"}) -[]-> (m) RETURN m.ChineseName", nodeName);
+            String cypher2 = String.format("MATCH (n) -[]-> (m{ChineseName:\"%s\"}) RETURN n.ChineseName", nodeName);
             LOG.debug(cypher);
             LOG.debug(cypher2);
-            StatementResult result=tx.run(cypher);
-            StatementResult result2=tx.run(cypher2);
-            List<Record> records=result.list();
-            List<Record> records2=result2.list();
-            if(!records.isEmpty()){
-                for (Record record:records){
+            StatementResult result = tx.run(cypher);
+            StatementResult result2 = tx.run(cypher2);
+            List<Record> records = result.list();
+            List<Record> records2 = result2.list();
+            if (!records.isEmpty()) {
+                for (Record record : records) {
                     nodes.add(record.get(0).asString());
                 }
             }
-            if(!records2.isEmpty()){
-                for (Record record:records2){
+            if (!records2.isEmpty()) {
+                for (Record record : records2) {
                     nodes.add(record.get(0).asString());
                 }
             }
@@ -776,21 +836,22 @@ public class GraphBaseUtils {
 
     /**
      * 创建问题节点
+     *
      * @param asking
      * @param typeName
      * @param nodeName
      * @param questionID
      */
-    public static void createQuestionNode(String asking,String typeName,String nodeName,String questionID){
+    public static void createQuestionNode(String asking, String typeName, String nodeName, String questionID) {
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
-            if(typeName.equals(asking)){
-                String cypher = "create(:"+questionID+"{typeName:'"+typeName+"',name:'"+nodeName+"',asking:'"+asking+"'})";
+            if (typeName.equals(asking)) {
+                String cypher = "create(:" + questionID + "{typeName:'" + typeName + "',name:'" + nodeName + "',asking:'" + asking + "'})";
 
                 LOG.debug(cypher);
                 tx.run(cypher);
                 tx.success();
-            }else {
-                String cypher = "create(:"+questionID+"{typeName:'"+typeName+"',name:'"+nodeName+"'})";
+            } else {
+                String cypher = "create(:" + questionID + "{typeName:'" + typeName + "',name:'" + nodeName + "'})";
 
                 LOG.debug(cypher);
                 tx.run(cypher);
@@ -801,13 +862,13 @@ public class GraphBaseUtils {
     }
 
 
-    public static void createQuestionRelationship(String startNode, String endNode, boolean flag, String relationshipName, String isConclusion,String questionID) {
+    public static void createQuestionRelationship(String startNode, String endNode, boolean flag, String relationshipName, String isConclusion, String questionID) {
         try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
             String s = "create(m) -[:" + questionID + "{name:'" + relationshipName + "'}]->(n)";
             if (flag) {
-                s = "create(n) -[:" + questionID + "{name:'" + relationshipName + "',isConclusion:'"+isConclusion+"'}]->(m)";
+                s = "create(n) -[:" + questionID + "{name:'" + relationshipName + "',isConclusion:'" + isConclusion + "'}]->(m)";
             }
-            String cypher = "match (n: "+ questionID +"{name:'" + startNode + "'})" + "match(m:"+ questionID +"{name:'" + endNode + "'})" + s;
+            String cypher = "match (n: " + questionID + "{name:'" + startNode + "'})" + "match(m:" + questionID + "{name:'" + endNode + "'})" + s;
             LOG.debug(cypher);
             tx.run(cypher);
             tx.success();
@@ -816,21 +877,22 @@ public class GraphBaseUtils {
 
     /**
      * 输入两个节点中文名返回节点之间的关系
+     *
      * @param node1
      * @param node2
      * @return
      */
-    public static List<String> getRelationsBetweenTwoNodes(String node1,String node2){
-        List<String> relations=new ArrayList<>();
-        String cypher= String.format("match(n{name:\"%s\"})-[r]->(m{name:\"%s\"}) return r.name", node1, node2);
+    public static List<String> getRelationsBetweenTwoNodes(String node1, String node2) {
+        List<String> relations = new ArrayList<>();
+        String cypher = String.format("match(n{name:\"%s\"})-[r]->(m{name:\"%s\"}) return r.name", node1, node2);
         LOG.debug(cypher);
-        try (Transaction tx=DriverSingleton.getInstance().session().beginTransaction()){
-            StatementResult result=tx.run(cypher);
-            List<Record> records=result.list();
-            for(Record record:records){
-                if(!record.get(0).asString().equals("null")){
-                    relations.add(record.get(0).asString());
-                }
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            StatementResult result = tx.run(cypher);
+            List<Record> records = result.list();
+                for (Record record : records) {
+                    if (!record.get(0).asString().equals("null")) {
+                        relations.add(record.get(0).asString());
+                    }
 
             }
             tx.success();
@@ -841,24 +903,25 @@ public class GraphBaseUtils {
 
     /**
      * 返回关系的属性
+     *
      * @param relationName
      * @return
      * @throws Exception
      */
-    public static Map<String,Object> getPropertiesOfRelation(String relationName) throws Exception {
-        Map<String,Object> res=new HashMap<>();
-        String cypher=String.format("match(n)-[r{ChineseName:\"%s\"}]->(m) return r",relationName);
+    public static Map<String, Object> getPropertiesOfRelation(String relationName) throws Exception {
+        Map<String, Object> res = new HashMap<>();
+        String cypher = String.format("match(n)-[r{ChineseName:\"%s\"}]->(m) return r", relationName);
         LOG.debug(cypher);
-        try (Transaction tx=DriverSingleton.getInstance().session().beginTransaction()){
-            StatementResult result=tx.run(cypher);
-            List<Record> records=result.list();
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            StatementResult result = tx.run(cypher);
+            List<Record> records = result.list();
             Value value = records.get(0).values().get(0);
             RelationshipValue relationshipValue = (RelationshipValue) value;
             InternalRelationship relationship = (InternalRelationship) relationshipValue.asObject();
             Map<String, Object> map = relationship.asMap();
-            for(Map.Entry<String, Object> entry:map.entrySet()){
-                if(!entry.getKey().equals("ChineseName")){
-                    res.put(entry.getKey(),entry.getValue());
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if (!entry.getKey().equals("ChineseName")) {
+                    res.put(entry.getKey(), entry.getValue());
                 }
             }
         }
@@ -867,32 +930,63 @@ public class GraphBaseUtils {
 
     /**
      * 返回两个节点之间的关系及其关系的属性
+     *
      * @param node1
      * @param node2
      * @return
      * @throws Exception
      */
-    public static Map<String,Map<String,Object>> getPropertiesBetweenTwoNodes(String node1,String node2) throws Exception {
-        Map<String,Map<String,Object>> map=new HashMap<>();
-        List<String> relations=getRelationsBetweenTwoNodes(node1,node2);
-        for(String relation:relations){
-            map.put(relation,getPropertiesOfRelation(relation));
+    public static Map<String, Map<String, Object>> getPropertiesBetweenTwoNodes(String node1, String node2) throws Exception {
+        Map<String, Map<String, Object>> map = new HashMap<>();
+        List<String> relations = getRelationsBetweenTwoNodes(node1, node2);
+        for (String relation : relations) {
+            map.put(relation, getPropertiesOfRelation(relation));
         }
-        if(map.size()==0){
-            relations=getRelationsBetweenTwoNodes(node2,node1);
-            for(String relation:relations){
-                map.put(relation,getPropertiesOfRelation(relation));
+        if (map.size() == 0) {
+            relations = getRelationsBetweenTwoNodes(node2, node1);
+            for (String relation : relations) {
+                map.put(relation, getPropertiesOfRelation(relation));
             }
         }
         return map;
     }
+
+    /**
+     * 得到某个节点的所有属性
+     *
+     * @param name
+     */
+    public static void getProperty(String name) {
+        try (Transaction tx = DriverSingleton.getInstance().session().beginTransaction()) {
+            //match (n:代数{name:"函数"})-[r]->(m:代数) return n,m,r
+            String cypher = String.format("match (n{name:\"%s\"}) return n", name);
+            //   LOG.debug(cypher);
+            StatementResult result = tx.run(cypher);
+            //   List<String> re = new ArrayList<>();
+            if (!result.hasNext()) {
+                return;
+            }
+            while (result.hasNext()) {
+                Record tmp = result.next();
+                String start = tmp.get(0).get("name").toString();
+
+                System.out.println("name:" + start);
+            }
+//            }
+            tx.success();
+            tx.close();
+
+            //   System.out.println(re);
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 //        System.out.println(getPropertiesBetweenTwoNodes("数列","数列的项"));
-     //   System.out.println(getPropertiesOfRelation("值关系"));
-     //   System.out.println(getRelationsBetweenTwoNodes("函数","增函数"));
-      //  getAllNodesHasRelation1("函数", "前置关系", true);   //获取节点指定关系的其他节点
-         getAllNodesHasRelation2("平行四边形", false);   //获取节点的所有相关节点
-
+        //   System.out.println(getPropertiesOfRelation("值关系"));
+           System.out.println(getRelationsBetweenTwoNodes("函数","一次函数"));
+       //   getAllNodesHasRelation1("方程", "前置关系", true);   //获取节点指定关系的其他节点
+      //  getAllNodesHasRelation2("圆");   //获取节点的所有相关节点
+     //   getProperty("三角形");
     }
 
 }

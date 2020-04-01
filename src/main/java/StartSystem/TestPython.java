@@ -40,26 +40,20 @@ public class TestPython {
         try {
             child = runtime.exec(cmd);
             InputStream in = child.getInputStream();
-            String output = null;
-            int isSuccessful = 0;
+            String output;
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in, "gbk"));
-
             output = bufferedReader.readLine();
             while (output != null) {
-                if(i!=2) {   //不输出第2行
+                //由于在python中的处理结果会输出多行无用信息，因此在此只接收了必要的行信息
+                if (i != 2) {
                     System.out.println(output);
                 }
                 output = bufferedReader.readLine();
                 i++;
 
-                if (i >= 7 && i <= 9) {
+                if (i >= 7 && i <= 10) {
                     kownledge.add(output);
                 }
-            }
-            try {
-                //isSuccessful = child.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -70,6 +64,5 @@ public class TestPython {
         }
         return kownledge;
     }
-
 
 }

@@ -3,10 +3,7 @@ package StartSystem;
 import util.GraphBaseUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Scanner;
+import java.util.*;
 
 public class QASystem {
     static Scanner scanner = new Scanner(System.in);
@@ -29,7 +26,28 @@ public class QASystem {
             e.printStackTrace();
         }
 
-        TestPython.runCMD("cmd /c C:\\Users\\27124\\PycharmProjects\\Similarity\\script.bat");
+        //    TestPython.runCMD("cmd /c C:\\Users\\27124\\PycharmProjects\\Similarity\\script.bat");
+
+        ArrayList<String> kownledgeSimilar = TestPython.runCMD("cmd /c C:\\Users\\27124\\PycharmProjects\\Similarity\\script.bat");
+        ArrayList<String> kownledge = new ArrayList<>();
+        for (int i = 0; i < kownledgeSimilar.size() && i < 3; i++) {
+            String[] tmp = kownledgeSimilar.get(i).split("'");
+            kownledge.add(tmp[1]);
+        }
+
+        System.out.println("知识点过滤前：" + kownledge);
+        //依据知识点关系和知识点的年级对知识点进行过滤
+        for (int i = 0; i < kownledge.size() - 1; i++) {
+            for (int j = i + 1; j < kownledge.size(); j++) {
+                List<String> tmp = GraphBaseUtils.getRelationsBetweenTwoNodes(kownledge.get(i), kownledge.get(j));
+                List<String> tmp1 = GraphBaseUtils.getRelationsBetweenTwoNodes(kownledge.get(j), kownledge.get(i));
+                if (tmp.size() != 0 || tmp1.size() != 0) {
+                    kownledge.remove(j);
+                    j--;
+                }
+            }
+        }
+        System.out.println("根据知识点关系过滤后：" + kownledge);
 
     }
 
@@ -40,20 +58,27 @@ public class QASystem {
         System.out.println("请输入一个知识点：");
         String kownledge = scanner.nextLine();
         HashSet<String> kownSet = new HashSet<>();
-        kownSet.add(kownledge);
+        //  kownSet.add(kownledge);
         //集合中存放的是需要查找的无重复的知识点
-        HashSet<String> kownledges = GraphBaseUtils.getAllNodesHasRelation2(kownledge, true);   //获取节点的所有相关节点
+        HashMap<String, String> kownledges = GraphBaseUtils.getAllNodesHasRelation2(kownledge);   //获取节点的所有相关节点
+        //  kownSet.add(kownledge.);
+        kownledges.put(kownledge, "当前知识点");
         if (kownledges != null) {
-            for (String i : kownledges) {
+            for (String i : kownledges.keySet()) {
                 kownSet.add(i);
             }
         }
-        System.out.println(kownSet);
+
+        System.out.println("当前知识点：" + kownledge);
+        for (String i : kownSet) {
+            System.out.println(kownledges.get(i) + ":" + i);
+        }
+
         HashMap<String, String> map = new HashMap<>();
-        HashSet<String> questionSet = new HashSet<>();
+        HashMap<String, String> questionSet = new HashMap<>();
         System.out.println("=================相似题目推荐============");
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\知识点汇总1.csv"));//换成你的文件名
+            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\知识点汇总2.csv"));//换成你的文件名
             reader.readLine();//第一行信息，为标题信息，不用,如果需要，注释掉
             String line = null;
             while ((line = reader.readLine()) != null) {
@@ -61,20 +86,22 @@ public class QASystem {
                 if (item.length != 5) {
                     continue;
                 }
-                for (int i = item.length - 3; i < item.length-1; i++) {
+                for (int i = item.length - 3; i < item.length - 1; i++) {
                     if (kownSet.contains(item[i])) {
                         //    map.put(item[2], item[0]);
-                     //   System.out.println(item[0]);
-                        questionSet.add(item[0]);
+                        //   System.out.println(item[0]);
+                        //  questionSet.put(ko)
+                        System.out.println(kownledges.get(item[i]) + "->" + item[i] + "->" + item[0]);
+                        //   questionSet.put();
                     }
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        for (String i : questionSet) {
+       /* for (String i : questionSet) {
             System.out.println(i);
-        }
+        }*/
     }
 
     /**
@@ -97,16 +124,36 @@ public class QASystem {
 
         ArrayList<String> kownledgeSimilar = TestPython.runCMD("cmd /c C:\\Users\\27124\\PycharmProjects\\Similarity\\script.bat");
         ArrayList<String> kownledge = new ArrayList<>();
-        for (String i : kownledgeSimilar) {
-            String[] tmp = i.split("'");
+        for (int i = 0; i < kownledgeSimilar.size() && i < 3; i++) {
+            String[] tmp = kownledgeSimilar.get(i).split("'");
             kownledge.add(tmp[1]);
         }
-        System.out.println(kownledge);
+
+        /*for (String i : kownledgeSimilar) {
+            String[] tmp = i.split("'");
+            kownledge.add(tmp[1]);
+            break;
+        }*/
+        System.out.println("知识点过滤前：" + kownledge);
+        //依据知识点关系和知识点的年级对知识点进行过滤
+        for (int i = 0; i < kownledge.size() - 1 ; i++) {
+            for (int j = i + 1; j < kownledge.size(); j++) {
+                List<String> tmp = GraphBaseUtils.getRelationsBetweenTwoNodes(kownledge.get(i), kownledge.get(j));
+                List<String> tmp1 = GraphBaseUtils.getRelationsBetweenTwoNodes(kownledge.get(j), kownledge.get(i));
+                if (tmp.size() != 0 || tmp1.size() != 0) {
+                    kownledge.remove(j);
+                    j--;
+                }
+            }
+        }
+        System.out.println("根据知识点关系过滤后：" + kownledge);
+        //根据知识点的教学范围对知识点进行过滤
+
 
         HashSet<String> questionSet = new HashSet<>();
         System.out.println("=================相似题目推荐============");
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\知识点汇总1.csv"));//换成你的文件名
+            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\27124\\Desktop\\毕业论文\\dissertation\\知识点汇总2.csv"));//换成你的文件名
             reader.readLine();//第一行信息，为标题信息，不用,如果需要，注释掉
             String line = null;
             while ((line = reader.readLine()) != null) {
@@ -114,10 +161,11 @@ public class QASystem {
                 if (item.length != 5) {
                     continue;
                 }
-                for (int i = item.length - 3; i < item.length-1; i++) {
+                for (int i = item.length - 3; i < item.length - 1; i++) {
                     if (kownledge.contains(item[i])) {
                         //    map.put(item[2], item[0]);
-                        questionSet.add(item[0]);
+                        System.out.println(item[i] + "->" + item[0]);
+                        //  questionSet.add(item[0]);
                     }
                 }
             }
@@ -125,9 +173,6 @@ public class QASystem {
             e.printStackTrace();
         }
 
-        for (String i : questionSet) {
-            System.out.println(i);
-        }
     }
 
     /**
@@ -136,7 +181,7 @@ public class QASystem {
     public static void four() {
         System.out.println("请输入一个知识点：");
         String kownledge = scanner.nextLine();
-        GraphBaseUtils.getAllNodesHasRelation2(kownledge, true);   //获取节点的所有相关节点
+        GraphBaseUtils.getAllNodesHasRelation2(kownledge);   //获取节点的所有相关节点
     }
 
     public static void main(String[] args) {
